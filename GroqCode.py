@@ -3,7 +3,9 @@ import os
 from groq import Groq
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
+
 # Fetch API key from environment variables
 api_key = os.getenv("GROQ_API_KEY")
 
@@ -13,21 +15,31 @@ else:
     # Initialize Groq client with the API key
     client = Groq(api_key=api_key)
 
-    # Function to generate code from user input
+    # Function to generate code from user input with template
     def generate_code(instruction):
+        # Define the prompt template with instruction to generate only code
+        prompt_template = f"""
+        You are an AI assistant. Generate only the code based on the following instruction. 
+        Do not include any explanations, comments, or extra text. Return only the code and nothing else.
+
+        Instruction: {instruction}
+
+        Code:
+        
+        
+        Your code is given above
+        """
+
         completion = client.chat.completions.create(
             model="gemma-7b-it",
             messages=[
-                {
-                    "role": "user",
-                    "content": instruction
-                }
+                {"role": "user", "content": prompt_template}
             ],
             temperature=1,
             max_tokens=1024,
             top_p=1,
-            stream=True,
-            stop=None,
+            stream=True,  # Stream the response in real-time
+            stop=["Your code is given above", "Explanation", "Comment"],  # Stop sequence to ensure only code is returned
         )
         generated_code = ""
         for chunk in completion:
@@ -48,4 +60,3 @@ else:
             st.write("Generating code based on your instruction...")
             generated_code = generate_code(user_input)
             st.success("Code generation complete!")
-       

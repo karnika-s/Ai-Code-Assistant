@@ -17,22 +17,30 @@ async def index(request: Request):
         )
 
     client = Groq(api_key=GROQ_API_KEY)
-
     data = await request.json()
     instruction = data.get("instruction")
+
+    # Define the prompt template to give only the code, with a stop sequence
+    prompt_template = f"""
+    You are an AI assistant. Generate only the code based on the following instruction. 
+    Do not include any explanations, comments, or extra text. Return only the code and nothing else.
+
+    Instruction: {instruction}
+
+    Code:
+    """
 
     def generate_code(instruction):
         completion = client.chat.completions.create(
             model="gemma-7b-it",
             messages=[
-                {"role": "user", "content": instruction}
+                {"role": "user", "content": prompt_template}
             ],
             temperature=1,
             max_tokens=1024,
             top_p=1,
-            # Set stream to False
             stream=False,
-            stop=None,
+            stop=["\n\n", "Explanation", "Comment"],  # Stop sequence to ensure only code is returned
         )
         generated_code = ""
         for chunk in completion:
@@ -40,4 +48,3 @@ async def index(request: Request):
         return generated_code
 
     return {"user_input": instruction, "generated_code": generate_code(instruction)}
-
