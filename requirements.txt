@@ -7,4 +7,10 @@ groq
 
 fastapi
 uvicorn
+openai==0.28
+faiss-cpu
+langchain-google-genai
+langchain
+langchain-community
+
 
