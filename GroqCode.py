@@ -16,19 +16,33 @@ else:
     client = Groq(api_key=api_key)
 
     # Function to generate code from user input with template
-    def generate_code(instruction):
-        # Define the prompt template with instruction to generate only code
-        prompt_template = f"""
-        You are an AI assistant. Generate only the code based on the following instruction. 
-        Do not include any explanations, comments, or extra text. Return only the code and nothing else.
+    def generate_code(instruction, complete=False):
+        # Define the prompt template for generating code
+        if not complete:
+            prompt_template = f"""
+            You are an AI assistant. Generate only the code based on the following instruction. 
+            Do not include any explanations, comments, or extra text. Return only the code and nothing else.
 
-        Instruction: {instruction}
+            Instruction: {instruction}
 
-        Code:
-        
-        
-        Your code is given above
-        """
+            Code:
+
+
+            Your code is given above
+            """
+        else:
+            # Define the prompt template for completing code
+            prompt_template = f"""
+            You are an AI assistant. Generate only the code based on the following instruction. 
+            Do not include any explanations, comments, or extra text. Return only the code and nothing else.
+
+            Instruction: {instruction}
+            Complete the above code
+            Code:
+
+
+            Your code is given above
+            """
 
         completion = client.chat.completions.create(
             model="gemma-7b-it",
@@ -54,9 +68,16 @@ else:
     # User input for instructions
     user_input = st.text_area("Enter your code instruction:")
 
-    # Generate button
+    # Generate Code button (row 1)
     if st.button("Generate Code"):
         if user_input:
             st.write("Generating code based on your instruction...")
             generated_code = generate_code(user_input)
             st.success("Code generation complete!")
+
+    # Complete Code button (row 2)
+    if st.button("Complete Code"):
+        if user_input:
+            st.write("Completing code based on your instruction...")
+            generated_code = generate_code(user_input, complete=True)
+            st.success("Code completion complete!")

@@ -28,6 +28,9 @@ async def index(request: Request):
     Instruction: {instruction}
 
     Code:
+        
+        
+    Your code is given above
     """
 
     def generate_code(instruction):
@@ -40,7 +43,7 @@ async def index(request: Request):
             max_tokens=1024,
             top_p=1,
             stream=False,
-            stop=["\n\n", "Explanation", "Comment"],  # Stop sequence to ensure only code is returned
+            stop=["Your code is given above", "Explanation", "Comment"],  # Stop sequence to ensure only code is returned
         )
         generated_code = ""
         for chunk in completion:
